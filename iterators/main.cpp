@@ -1,54 +1,69 @@
-#include <iostream>
-#include <array>
-//TODO: сделать итератор для array, который будет возвращать зачения умноженные на 2
+#include <algorithm>
+#include <iostream> // добавлено
 
-
-template <typename T>
-    requires std::integral<T>
-class Iterator final
-{
-    using iterator_category = std::input_iterator_tag;
-    using difference_type = std::ptrdiff_t;
-    using value_tupe = T;
-    using pointer = T *;
-    using reference = T &;
-
+template <typename T, size_t N>
+class SimpleArray {
 public:
-    Iterator(T *ptr) : _ptr(ptr) {};
-    int &operator*() const { return *_ptr; }
-    int *operator->() { return _ptr; }
-    // Prefix increment
-    Iterator &operator++()
-    {
-        (&_ptr*2)++;
-        return *this;
-    }
+    class Iterator {
+    public:
+        using iterator_category = std::random_access_iterator_tag; // исправлено
+        using value_type = T;
+        using difference_type = std::ptrdiff_t;
+        using pointer = T*;
+        using reference = T&;
 
-    // Postfix increment
-    Iterator operator++(int)
-    {
-        Iterator tmp = *this;
-        (&_ptr*2)++;
-        return tmp;
-    }
+        explicit Iterator(pointer ptr) : current(ptr) {}
 
-    Iterator begin() { return &_ptr[0]; };
-    Iterator end(){ return &_ptr[10]; };
+        reference operator*() const { return *current; }
+        pointer operator->() { return current; }
 
-    friend bool operator==(const Iterator &a, const Iterator &b) { return a._ptr == b._ptr; };
-    friend bool operator!=(const Iterator &a, const Iterator &b) { return a._ptr != b._ptr; };
+        Iterator& operator++() { ++current; return *this; }
+        Iterator operator++(int) { Iterator tmp = *this; ++current; return tmp; }
+        Iterator& operator--() { --current; return *this; }
+        Iterator operator--(int) { Iterator tmp = *this; --current; return tmp; }
+
+        bool operator==(const Iterator& other) const { return current == other.current; }
+        bool operator!=(const Iterator& other) const { return current != other.current; }
+        bool operator<(const Iterator& other) const { return current < other.current; }
+        bool operator>(const Iterator& other) const { return current > other.current; }
+        bool operator<=(const Iterator& other) const { return current <= other.current; }
+        bool operator>=(const Iterator& other) const { return current >= other.current; }
+
+        difference_type operator-(const Iterator& other) const { return current - other.current; }
+        Iterator operator+(difference_type n) const { return Iterator(current + n); }
+        Iterator operator-(difference_type n) const { return Iterator(current - n); }
+        Iterator& operator+=(difference_type n) { current += n; return *this; }
+        Iterator& operator-=(difference_type n) { current -= n; return *this; }
+        reference operator[](difference_type n) const { return *(current + n); }
+
+    private:
+        pointer current;
+    };
+
+    Iterator begin() { return Iterator(data); }
+    Iterator end() { return Iterator(data + N); }
+    const Iterator begin() const { return Iterator(data); }
+    const Iterator end() const { return Iterator(data + N); }
+
+    T& operator[](size_t index) { return data[index]; }
+    const T& operator[](size_t index) const { return data[index]; }
 
 private:
-    T *_ptr;
+    T data[N];
 };
 
-int main(int, char **)
-{
-    std::array <int, 10> arr = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    Iterator<int> it;
-    for (auto &i : it)
-    {
-        std::cout << i << " ";
+int main() {
+    SimpleArray<int, 5> arr;
+    arr[0] = 5; arr[1] = 3; arr[2] = 1; arr[3] = 4; arr[4] = 2;
+
+    for (int num : arr) {
+        std::cout << num << " ";
     }
-    return 0;
+
+    std::sort(arr.begin(), arr.end());
+
+    std::cout << "\nAfter sorting: ";
+    for (int num : arr) {
+        std::cout << num << " ";
+    }
 }
