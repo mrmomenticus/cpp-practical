@@ -11,7 +11,7 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(Catch2)
 
-add_executable(iterators main.cpp)
+add_executable(iterators iterators/iterators.cpp)
 
 target_compile_features(iterators PUBLIC cxx_std_23)
 target_link_libraries(iterators PRIVATE Catch2::Catch2WithMain)
