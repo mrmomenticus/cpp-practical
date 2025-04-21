@@ -1,6 +1,6 @@
 #include <algorithm>
 #include <iostream> // добавлено
-
+#include <catch2/catch_test_macros.hpp>
 template <typename T, size_t N>
 class SimpleArray {
 public:
@@ -52,18 +52,14 @@ private:
     T data[N];
 };
 
-int main() {
+TEST_CASE("My iterators") {
     SimpleArray<int, 5> arr;
     arr[0] = 5; arr[1] = 3; arr[2] = 1; arr[3] = 4; arr[4] = 2;
 
     for (int num : arr) {
         std::cout << num << " ";
     }
-
     std::sort(arr.begin(), arr.end());
-
-    std::cout << "\nAfter sorting: ";
-    for (int num : arr) {
-        std::cout << num << " ";
-    }
+    REQUIRE(arr[0] == 1);
+    REQUIRE(arr[4] == 5);
 }
